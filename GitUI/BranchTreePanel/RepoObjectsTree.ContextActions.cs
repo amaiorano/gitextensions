@@ -73,6 +73,48 @@ namespace GitUI.BranchTreePanel
             mnubtnEnableRemoteAndFetch.Visible = !node.Enabled;
         }
 
+        private void ContextMenuSubmoduleSpecific(ContextMenuStrip contextMenu)
+        {
+            TreeNode selectedNode = (contextMenu.SourceControl as TreeView)?.SelectedNode;
+            if (selectedNode == null)
+            {
+                return;
+            }
+
+            if (contextMenu == menuAllSubmodules)
+            {
+                if (!(selectedNode.Tag is SubmoduleTree submoduleTree))
+                {
+                    return;
+                }
+
+                string topProjectName = submoduleTree.TopProjectName;
+                mnubtnOpenTopProject.Visible = topProjectName != null;
+                mnubtnOpenTopProject.Text = topProjectName != null ?
+                    string.Format("&Open top project: {0}", topProjectName) : string.Empty;
+
+                string superProjectName = submoduleTree.SuperProjectName;
+                mnubtnOpenSuperProject.Visible = superProjectName != null;
+                mnubtnOpenSuperProject.Text = superProjectName != null ?
+                    string.Format("&Open super project: {0}", superProjectName.SubstringAfterLast('/')) : string.Empty;
+
+                bool bareRepository = Module.IsBareRepository();
+                mnubtnManageSubmodules.Enabled = !bareRepository;
+                mnubtnUpdateAllSubmodules.Enabled = !bareRepository;
+                mnubtnSynchronizeSubmodules.Enabled = !bareRepository;
+            }
+            else if (contextMenu == menuSubmodule)
+            {
+                if (!(selectedNode.Tag is SubmoduleNode submoduleNode))
+                {
+                    return;
+                }
+
+                mnubtnOpenSubmodule.Visible = submoduleNode.CanOpen;
+                mnubtnUpdateSubmodule.Visible = true;
+            }
+        }
+
         private void OnNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             _lastRightClickedNode = e.Button == MouseButtons.Right ? e.Node : null;
@@ -132,6 +174,16 @@ namespace GitUI.BranchTreePanel
             Node.RegisterContextMenu(typeof(TagNode), menuTag);
 
             RegisterClick(mnuBtnManageRemotesFromRootNode, () => _remotesTree.PopupManageRemotesForm(remoteName: null));
+
+            RegisterClick(mnubtnUpdateAllSubmodules, () => _submoduleTree.UpdateAllSubmodules(this));
+            RegisterClick(mnubtnOpenTopProject, () => _submoduleTree.OpenTopProject(this));
+            RegisterClick(mnubtnOpenSuperProject, () => _submoduleTree.OpenSuperProject(this));
+            RegisterClick(mnubtnManageSubmodules, () => _submoduleTree.ManageSubmodules(this));
+            RegisterClick(mnubtnSynchronizeSubmodules, () => _submoduleTree.SynchronizeSubmodules(this));
+
+            RegisterClick<SubmoduleNode>(mnubtnOpenSubmodule, node => _submoduleTree.OpenSubmodule(this, node));
+            RegisterClick<SubmoduleNode>(mnubtnUpdateSubmodule, node => _submoduleTree.UpdateSubmodule(this, (SubmoduleNode)node));
+            Node.RegisterContextMenu(typeof(SubmoduleNode), menuSubmodule);
         }
 
         private void FilterInRevisionGrid(BaseBranchNode branch)
@@ -150,6 +202,7 @@ namespace GitUI.BranchTreePanel
             ContextMenuAddExpandCollapseTree(contextMenu);
             ContextMenuBranchSpecific(contextMenu);
             ContextMenuRemoteRepoSpecific(contextMenu);
+            ContextMenuSubmoduleSpecific(contextMenu);
         }
     }
 }

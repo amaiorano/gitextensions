@@ -35,6 +35,21 @@ namespace GitUI.BranchTreePanel
             }
         }
 
+        private void tsmiShowSubmodules_Click(object sender, EventArgs e)
+        {
+            AppSettings.RepoObjectsTreeShowSubmodules = tsmiShowSubmodules.Checked;
+            _searchResult = null;
+            if (tsmiShowSubmodules.Checked)
+            {
+                AddSubmodules();
+            }
+            else
+            {
+                _rootNodes.Remove(_submoduleTree);
+                treeMain.Nodes.Remove(_submoduleTreeRootNode);
+            }
+        }
+
         private void tsmiShowTags_Click(object sender, EventArgs e)
         {
             AppSettings.RepoObjectsTreeShowTags = tsmiShowTags.Checked;

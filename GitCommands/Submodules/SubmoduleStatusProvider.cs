@@ -21,7 +21,85 @@ namespace GitCommands.Submodules
         void UpdateSubmodulesStatus(bool updateStatus, string workingDirectory, string noBranchText, Action onUpdateBegin, Func<SubmoduleInfoResult, CancellationToken, Task> onUpdateCompleteAsync);
     }
 
-    public sealed class SubmoduleStatusProvider : ISubmoduleStatusProvider
+    public class SubmoduleStatusEventArgs : EventArgs
+    {
+        [NotNull]
+        public SubmoduleInfoResult Info { get; }
+
+        [NotNull]
+        public CancellationToken Token { get; }
+
+        public SubmoduleStatusEventArgs(SubmoduleInfoResult info, CancellationToken token)
+        {
+            Info = info;
+            Token = token;
+        }
+    }
+
+    public delegate void SubmoduleStatusEventHandler(object sender, SubmoduleStatusEventArgs e);
+
+    // Singleton provider
+    public sealed class SubmoduleStatusProvider
+    {
+        private ISubmoduleStatusProvider _impl = new SubmoduleStatusProviderImpl();
+
+        private SubmoduleStatusEventArgs _lastStatusEventArgs = null;
+
+        public static SubmoduleStatusProvider Default { get; } = new SubmoduleStatusProvider();
+
+        // Invoked when status update is requested (use to clear/lock UI)
+        public event EventHandler StatusUpdateBegin;
+
+        // Invoked when status update is complete
+        public event SubmoduleStatusEventHandler StatusUpdated;
+
+        public void Init()
+        {
+            _impl.Init();
+        }
+
+        public bool HasChangedToNone([CanBeNull] IReadOnlyList<GitItemStatus> allChangedFiles)
+        {
+            return _impl.HasChangedToNone(allChangedFiles);
+        }
+
+        public bool HasStatusChanges([CanBeNull] IReadOnlyList<GitItemStatus> allChangedFiles)
+        {
+            return _impl.HasStatusChanges(allChangedFiles);
+        }
+
+        public void UpdateSubmodulesStatus(bool updateStatus, string workingDirectory, string noBranchText)
+        {
+            _impl.UpdateSubmodulesStatus(updateStatus, workingDirectory, noBranchText, OnUpdateBegin, OnUpdateEndAsync);
+        }
+
+        public void ResendCachedStatus()
+        {
+            if (_lastStatusEventArgs != null)
+            {
+                OnUpdateBegin();
+                ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+                {
+                    await OnUpdateEndAsync(_lastStatusEventArgs.Info, _lastStatusEventArgs.Token);
+                }).FileAndForget();
+            }
+        }
+
+        private void OnUpdateBegin()
+        {
+            StatusUpdateBegin?.Invoke(this, EventArgs.Empty);
+        }
+
+        private async Task OnUpdateEndAsync(SubmoduleInfoResult info, CancellationToken token)
+        {
+            await TaskScheduler.Default;
+            token.ThrowIfCancellationRequested();
+            _lastStatusEventArgs = new SubmoduleStatusEventArgs(info, token);
+            StatusUpdated?.Invoke(this, _lastStatusEventArgs);
+        }
+    }
+
+    public sealed class SubmoduleStatusProviderImpl : ISubmoduleStatusProvider
     {
         private readonly CancellationTokenSequence _submodulesStatusSequence = new CancellationTokenSequence();
         private DateTime _previousSubmoduleUpdateTime;

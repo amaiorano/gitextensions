@@ -29,6 +29,11 @@ namespace GitUI.BranchTreePanel
                 _nodesList.Add(node);
             }
 
+            public void AddNodes(IEnumerable<Node> nodes)
+            {
+                _nodesList.AddRange(nodes);
+            }
+
             public void Clear()
             {
                 _nodesList.Clear();
@@ -109,6 +114,7 @@ namespace GitUI.BranchTreePanel
             private readonly IGitUICommandsSource _uiCommandsSource;
 
             private readonly CancellationTokenSequence _reloadCancellationTokenSequence = new CancellationTokenSequence();
+            protected CancellationToken CurrentReloadCancellationToken;
 
             protected Tree(TreeNode treeNode, IGitUICommandsSource uiCommands)
             {
@@ -141,7 +147,7 @@ namespace GitUI.BranchTreePanel
             private void UICommands_PostRepositoryChanged(object sender, GitUIPluginInterfaces.GitUIEventArgs e)
             {
                 // Run on UI thread
-                TreeViewNode.TreeView.InvokeAsync(RefreshTree).FileAndForget();
+                TreeViewNode.TreeView?.InvokeAsync(RefreshTree).FileAndForget();
             }
 
             public abstract void RefreshTree();
@@ -170,6 +176,7 @@ namespace GitUI.BranchTreePanel
                     try
                     {
                         var token = _reloadCancellationTokenSequence.Next();
+                        CurrentReloadCancellationToken = token;
 
                         repoObjectTree.Enabled = false;
 

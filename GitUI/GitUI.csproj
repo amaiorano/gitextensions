@@ -99,6 +99,10 @@
       <SubType>UserControl</SubType>
       <DependentUpon>RepoObjectsTree.Nodes.cs</DependentUpon>
     </Compile>
+    <Compile Include="BranchTreePanel\RepoObjectsTree.Nodes.Submodules.cs">
+      <SubType>UserControl</SubType>
+      <DependentUpon>RepoObjectsTree.Nodes.cs</DependentUpon>
+    </Compile>
     <Compile Include="BranchTreePanel\RepoObjectsTree.Nodes.Tags.cs">
       <SubType>UserControl</SubType>
       <DependentUpon>RepoObjectsTree.Nodes.cs</DependentUpon>
