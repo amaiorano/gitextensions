@@ -104,9 +104,6 @@ namespace GitUI.BranchTreePanel
             this.menuSubmodule = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnubtnUpdateSubmodule = new System.Windows.Forms.ToolStripMenuItem();
             this.menuAllSubmodules = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.mnubtnUpdateAllSubmodules = new System.Windows.Forms.ToolStripMenuItem();
-            this.mnubtnOpenTopProject = new System.Windows.Forms.ToolStripMenuItem();
-            this.mnubtnOpenSuperProject = new System.Windows.Forms.ToolStripMenuItem();
             this.mnubtnManageSubmodules = new System.Windows.Forms.ToolStripMenuItem();
             this.mnubtnSynchronizeSubmodules = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
@@ -623,7 +620,9 @@ namespace GitUI.BranchTreePanel
             // 
             this.menuSubmodule.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnubtnOpenSubmodule,
-            this.mnubtnUpdateSubmodule});
+            this.mnubtnUpdateSubmodule,
+            this.mnubtnManageSubmodules,
+            this.mnubtnSynchronizeSubmodules});
             this.menuSubmodule.Name = "contextmenuSubmodule";
             this.menuSubmodule.Size = new System.Drawing.Size(177, 26);
             this.menuSubmodule.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
@@ -646,39 +645,10 @@ namespace GitUI.BranchTreePanel
             // 
             // menuAllSubmodules
             // 
-            this.menuAllSubmodules.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnubtnOpenTopProject,
-            this.mnubtnOpenSuperProject,
-            this.mnubtnManageSubmodules,
-            this.mnubtnUpdateAllSubmodules,
-            this.mnubtnSynchronizeSubmodules});
+            this.menuAllSubmodules.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {});
             this.menuAllSubmodules.Name = "contextmenuSubmodules";
             this.menuAllSubmodules.Size = new System.Drawing.Size(196, 26);
             this.menuAllSubmodules.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
-            // 
-            // mnubtnUpdateAllSubmodules
-            // 
-            this.mnubtnUpdateAllSubmodules.Image = global::GitUI.Properties.Images.SubmodulesUpdate;
-            this.mnubtnUpdateAllSubmodules.Name = "mnubtnUpdateAllSubmodules";
-            this.mnubtnUpdateAllSubmodules.Size = new System.Drawing.Size(195, 22);
-            this.mnubtnUpdateAllSubmodules.Text = "&Update all";
-            this.mnubtnUpdateAllSubmodules.ToolTipText = "Update all submodules recursively";
-            // 
-            // mnubtnOpenTopProject
-            // 
-            this.mnubtnOpenTopProject.Image = global::GitUI.Properties.Images.FolderOpen;
-            this.mnubtnOpenTopProject.Name = "mnubtnOpenTopProject";
-            this.mnubtnOpenTopProject.Size = new System.Drawing.Size(195, 22);
-            this.mnubtnOpenTopProject.Text = "Open &top project";
-            this.mnubtnOpenTopProject.ToolTipText = "Open top project";
-            // 
-            // mnubtnOpenSuperProject
-            // 
-            this.mnubtnOpenSuperProject.Image = global::GitUI.Properties.Images.FolderOpen;
-            this.mnubtnOpenSuperProject.Name = "mnubtnOpenSuperProject";
-            this.mnubtnOpenSuperProject.Size = new System.Drawing.Size(195, 22);
-            this.mnubtnOpenSuperProject.Text = "Open &super project";
-            this.mnubtnOpenSuperProject.ToolTipText = "Open super project";
             // 
             // mnubtnManageSubmodules
             // 
@@ -779,9 +749,6 @@ namespace GitUI.BranchTreePanel
         private ToolTip toolTip;
         private ContextMenuStrip menuSubmodule;
         private ContextMenuStrip menuAllSubmodules;
-        private ToolStripMenuItem mnubtnUpdateAllSubmodules;
-        private ToolStripMenuItem mnubtnOpenTopProject;
-        private ToolStripMenuItem mnubtnOpenSuperProject;
         private ToolStripMenuItem mnubtnManageSubmodules;
         private ToolStripMenuItem mnubtnSynchronizeSubmodules;
         private ToolStripMenuItem mnubtnUpdateSubmodule;

@@ -87,21 +87,6 @@ namespace GitUI.BranchTreePanel
                 {
                     return;
                 }
-
-                string topProjectName = submoduleTree.TopProjectName;
-                mnubtnOpenTopProject.Visible = topProjectName != null;
-                mnubtnOpenTopProject.Text = topProjectName != null ?
-                    string.Format("&Open top project: {0}", topProjectName) : string.Empty;
-
-                string superProjectName = submoduleTree.SuperProjectName;
-                mnubtnOpenSuperProject.Visible = superProjectName != null;
-                mnubtnOpenSuperProject.Text = superProjectName != null ?
-                    string.Format("&Open super project: {0}", superProjectName.SubstringAfterLast('/')) : string.Empty;
-
-                bool bareRepository = Module.IsBareRepository();
-                mnubtnManageSubmodules.Enabled = !bareRepository;
-                mnubtnUpdateAllSubmodules.Enabled = !bareRepository;
-                mnubtnSynchronizeSubmodules.Enabled = !bareRepository;
             }
             else if (contextMenu == menuSubmodule)
             {
@@ -110,8 +95,11 @@ namespace GitUI.BranchTreePanel
                     return;
                 }
 
+                bool bareRepository = Module.IsBareRepository();
                 mnubtnOpenSubmodule.Visible = submoduleNode.CanOpen;
                 mnubtnUpdateSubmodule.Visible = true;
+                mnubtnManageSubmodules.Visible = !bareRepository && submoduleNode.IsCurrent;
+                mnubtnSynchronizeSubmodules.Visible = !bareRepository && submoduleNode.IsCurrent;
             }
         }
 
@@ -175,12 +163,8 @@ namespace GitUI.BranchTreePanel
 
             RegisterClick(mnuBtnManageRemotesFromRootNode, () => _remotesTree.PopupManageRemotesForm(remoteName: null));
 
-            RegisterClick(mnubtnUpdateAllSubmodules, () => _submoduleTree.UpdateAllSubmodules(this));
-            RegisterClick(mnubtnOpenTopProject, () => _submoduleTree.OpenTopProject(this));
-            RegisterClick(mnubtnOpenSuperProject, () => _submoduleTree.OpenSuperProject(this));
-            RegisterClick(mnubtnManageSubmodules, () => _submoduleTree.ManageSubmodules(this));
-            RegisterClick(mnubtnSynchronizeSubmodules, () => _submoduleTree.SynchronizeSubmodules(this));
-
+            RegisterClick<SubmoduleNode>(mnubtnManageSubmodules, _ => _submoduleTree.ManageSubmodules(this));
+            RegisterClick<SubmoduleNode>(mnubtnSynchronizeSubmodules, _ => _submoduleTree.SynchronizeSubmodules(this));
             RegisterClick<SubmoduleNode>(mnubtnOpenSubmodule, node => _submoduleTree.OpenSubmodule(this, node));
             RegisterClick<SubmoduleNode>(mnubtnUpdateSubmodule, node => _submoduleTree.UpdateSubmodule(this, (SubmoduleNode)node));
             Node.RegisterContextMenu(typeof(SubmoduleNode), menuSubmodule);

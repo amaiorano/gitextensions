@@ -187,19 +187,6 @@ namespace GitUI.BranchTreePanel
         private sealed class SubmoduleTree : Tree
         {
             private SubmoduleInfo _topProjectInfo;
-            private SubmoduleInfo _superProjectInfo;
-
-            [CanBeNull]
-            public string TopProjectName
-            {
-                get { return _topProjectInfo?.Text; }
-            }
-
-            [CanBeNull]
-            public string SuperProjectName
-            {
-                get { return _superProjectInfo?.Text; }
-            }
 
             public SubmoduleTree(TreeNode treeNode, IGitUICommandsSource uiCommands)
                 : base(treeNode, uiCommands)
@@ -255,12 +242,11 @@ namespace GitUI.BranchTreePanel
             private void FillSubmoduleTree(SubmoduleInfoResult result)
             {
                 _topProjectInfo = result.TopProject;
-                _superProjectInfo = result.SuperProject;
 
                 var nodes = new List<SubmoduleNode>();
 
                 // We always want to display submodules rooted from the top project. If the currently open project is the top project,
-                // OurSubodules contains all child submodules recursively; otherwise, if we're currently in a submodule, SuperSubmodules
+                // OurSubmodules contains all child submodules recursively; otherwise, if we're currently in a submodule, SuperSubmodules
                 // contains all submodule info relative to the top project.
                 if (result.SuperSubmodules?.Count > 0)
                 {
@@ -425,14 +411,11 @@ namespace GitUI.BranchTreePanel
                         }
                     }
 
-                    // Move children of root node to treeview
-                    Nodes.AddNodes(rootNode.Nodes);
+                    // Add top-module node, and move children of root to it
+                    var topModuleNode = new SubmoduleNode(this, _topProjectInfo, _topProjectInfo.Bold, "", _topProjectInfo.Path);
+                    topModuleNode.Nodes.AddNodes(rootNode.Nodes);
+                    Nodes.AddNode(topModuleNode);
                 }
-            }
-
-            public void UpdateAllSubmodules(IWin32Window owner)
-            {
-                UICommands.StartUpdateSubmodulesDialog(owner);
             }
 
             public void UpdateSubmodule(IWin32Window owner, SubmoduleNode node)
@@ -443,18 +426,6 @@ namespace GitUI.BranchTreePanel
             public void OpenSubmodule(IWin32Window owner, SubmoduleNode node)
             {
                 node.Open();
-            }
-
-            public void OpenTopProject(IWin32Window owner)
-            {
-                Trace.Assert(_topProjectInfo != null);
-                UICommands.BrowseSetWorkingDir(_topProjectInfo.Path);
-            }
-
-            public void OpenSuperProject(IWin32Window owner)
-            {
-                Trace.Assert(_superProjectInfo != null);
-                UICommands.BrowseSetWorkingDir(_superProjectInfo.Path);
             }
 
             public void ManageSubmodules(IWin32Window owner)
