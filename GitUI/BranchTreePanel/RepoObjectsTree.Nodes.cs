@@ -308,9 +308,15 @@ namespace GitUI.BranchTreePanel
                 return TreeViewNode.TreeView.FindForm();
             }
 
-            public virtual string DisplayText()
+            protected virtual string DisplayText()
             {
                 return ToString();
+            }
+
+            // Override to provide a unique node name (key), otherwise DisplayText is used
+            protected virtual string NodeName()
+            {
+                return DisplayText();
             }
 
             protected void SetNodeFont(FontStyle style)
@@ -343,7 +349,7 @@ namespace GitUI.BranchTreePanel
 
             protected void ApplyText()
             {
-                _treeViewNode.Name = DisplayText();
+                _treeViewNode.Name = NodeName();
                 _treeViewNode.Text = DisplayText();
             }
 

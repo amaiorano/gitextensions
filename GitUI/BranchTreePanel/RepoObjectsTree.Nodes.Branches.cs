@@ -86,7 +86,7 @@ namespace GitUI.BranchTreePanel
                 return result;
             }
 
-            public override string DisplayText()
+            protected override string DisplayText()
             {
                 return string.IsNullOrEmpty(AheadBehind) ? Name : $"{Name} ({AheadBehind})";
             }
