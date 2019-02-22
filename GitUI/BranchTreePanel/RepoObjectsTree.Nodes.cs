@@ -174,22 +174,18 @@ namespace GitUI.BranchTreePanel
 
                 ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
                 {
+                    Nodes.Clear();
+
+                    var token = _reloadCancellationTokenSequence.Next();
+                    await loadNodesTask(token);
+
                     var repoObjectTree = TreeViewNode.TreeView.Parent;
 
                     try
                     {
-                        var token = _reloadCancellationTokenSequence.Next();
-
                         repoObjectTree.Enabled = false;
                         TreeViewNode.TreeView.BeginUpdate();
                         IgnoreSelectionChangedEvent = true;
-                        Nodes.Clear();
-
-                        await loadNodesTask(token);
-
-                        token.ThrowIfCancellationRequested();
-                        await TreeViewNode.TreeView.SwitchToMainThreadAsync();
-
                         FillTreeViewNode(token, _firstReloadNodesSinceModuleChanged);
                     }
                     finally
