@@ -135,6 +135,7 @@ namespace GitUI.BranchTreePanel
                     // as well as less efficient.
                     _firstReloadNodesSinceModuleChanged = true;
 
+                    // Rebind callbacks
                     e.OldCommands.PostRepositoryChanged -= UICommands_PostRepositoryChanged;
                     uiCommands.UICommands.PostRepositoryChanged += UICommands_PostRepositoryChanged;
                 };
@@ -145,9 +146,12 @@ namespace GitUI.BranchTreePanel
             private void UICommands_PostRepositoryChanged(object sender, GitUIPluginInterfaces.GitUIEventArgs e)
             {
                 // Run on UI thread
-                TreeViewNode.TreeView?.InvokeAsync(RefreshTree).FileAndForget();
+                TreeViewNode.TreeView?.InvokeAsync(PostRepositoryChanged).FileAndForget();
             }
 
+            protected abstract void PostRepositoryChanged();
+
+            // Refresh tree from cached state (i.e. Branches/Remotes/Tags from Module, Submodules from last submodule status)
             public abstract void RefreshTree();
 
             public TreeNode TreeViewNode { get; }

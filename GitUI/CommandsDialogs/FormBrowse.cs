@@ -1322,8 +1322,13 @@ namespace GitUI.CommandsDialogs
 
         private void RefreshToolStripMenuItemClick(object sender, EventArgs e)
         {
+            // Broadcast RepoChanged in case repo was changed outside of GE
+            UICommands.RepoChangedNotifier.Notify();
+
+            /*
             RefreshRevisions();
             RefreshStatus();
+            */
         }
 
         private void RefreshDashboardToolStripMenuItemClick(object sender, EventArgs e)

@@ -25,6 +25,11 @@ namespace GitUI.BranchTreePanel
             {
             }
 
+            protected override void PostRepositoryChanged()
+            {
+                RefreshTree();
+            }
+
             public override void RefreshTree()
             {
                 ReloadNodes(LoadNodesAsync);

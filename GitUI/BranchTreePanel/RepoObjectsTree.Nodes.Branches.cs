@@ -197,6 +197,11 @@ namespace GitUI.BranchTreePanel
                 _aheadBehindDataProvider = aheadBehindDataProvider;
             }
 
+            protected override void PostRepositoryChanged()
+            {
+                RefreshTree();
+            }
+
             public override void RefreshTree()
             {
                 ReloadNodes(LoadNodesAsync);
